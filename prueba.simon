@@ -1,0 +1,6 @@
+simon dice numero var1 = 10;
+simon dice decimal var2 = 3.14;
+simon dice palabra var3 = "Hola Mundo";
+simon dice booleano var4 = verdadero;
+simon dice imprimirT (" Esto es una prueba.");
+simon dice imprimir (var2);
