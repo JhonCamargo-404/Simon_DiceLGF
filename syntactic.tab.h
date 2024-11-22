@@ -61,8 +61,13 @@ extern int yydebug;
     BOOLEANO = 262,                /* BOOLEANO  */
     IMPRIMIR = 263,                /* IMPRIMIR  */
     IMPRIMIR_TEXTO = 264,          /* IMPRIMIR_TEXTO  */
-    PUNTO_COMA = 265,              /* PUNTO_COMA  */
-    FIN_LINEA = 266                /* FIN_LINEA  */
+    SUMA = 265,                    /* SUMA  */
+    RESTA = 266,                   /* RESTA  */
+    MULTIPLICA = 267,              /* MULTIPLICA  */
+    DIVIDE = 268,                  /* DIVIDE  */
+    MODULO = 269,                  /* MODULO  */
+    PUNTO_COMA = 270,              /* PUNTO_COMA  */
+    FIN_LINEA = 271                /* FIN_LINEA  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -71,11 +76,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 26 "syntactic.y"
+#line 29 "syntactic.y"
 
     char* text;
 
-#line 79 "syntactic.tab.h"
+#line 84 "syntactic.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

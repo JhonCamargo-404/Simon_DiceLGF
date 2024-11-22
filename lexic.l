@@ -38,6 +38,36 @@ imprimir[ ]*\([ ]*[a-zA-Z_][a-zA-Z0-9_]*[ ]*\) {
                                 yylval.text = strndup(start, length);
                                 return IMPRIMIR; 
                              }
+suma[ ]*\([ ]*[a-zA-Z_][a-zA-Z0-9_]*,[ ]*[a-zA-Z_][a-zA-Z0-9_]*[ ]*\) { 
+                                char* start = strchr(yytext, '(') + 1; 
+                                char* end = strrchr(yytext, ')');
+                                yylval.text = strndup(start, end - start);
+                                return SUMA; 
+                             }
+resta[ ]*\([ ]*[a-zA-Z_][a-zA-Z0-9_]*,[ ]*[a-zA-Z_][a-zA-Z0-9_]*[ ]*\) { 
+                                char* start = strchr(yytext, '(') + 1; 
+                                char* end = strrchr(yytext, ')');
+                                yylval.text = strndup(start, end - start);
+                                return RESTA; 
+                             }
+multiplica[ ]*\([ ]*[a-zA-Z_][a-zA-Z0-9_]*,[ ]*[a-zA-Z_][a-zA-Z0-9_]*[ ]*\) { 
+                                char* start = strchr(yytext, '(') + 1; 
+                                char* end = strrchr(yytext, ')');
+                                yylval.text = strndup(start, end - start);
+                                return MULTIPLICA; 
+                             }
+divide[ ]*\([ ]*[a-zA-Z_][a-zA-Z0-9_]*,[ ]*[a-zA-Z_][a-zA-Z0-9_]*[ ]*\) { 
+                                char* start = strchr(yytext, '(') + 1; 
+                                char* end = strrchr(yytext, ')');
+                                yylval.text = strndup(start, end - start);
+                                return DIVIDE; 
+                             }
+modulo[ ]*\([ ]*[a-zA-Z_][a-zA-Z0-9_]*,[ ]*[a-zA-Z_][a-zA-Z0-9_]*[ ]*\) { 
+                                char* start = strchr(yytext, '(') + 1; 
+                                char* end = strrchr(yytext, ')');
+                                yylval.text = strndup(start, end - start);
+                                return MODULO; 
+                             }
 ;                           { return PUNTO_COMA; } 
 \n                          { } 
 [ \t]+                      { } 

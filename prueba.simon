@@ -1,6 +1,19 @@
 simon dice numero var1 = 10;
-simon dice decimal var2 = 3.14;
-simon dice palabra var3 = "Hola Mundo";
-simon dice booleano var4 = verdadero;
-simon dice imprimirT (" Esto es una prueba.");
-simon dice imprimir (var2);
+simon dice numero var2 = 3;
+simon dice decimal var3 = 3.14;
+simon dice palabra var4 = "Hola Mundo";
+simon dice booleano var5 = verdadero;
+
+simon dice imprimirT ("Esto es una prueba."); 
+simon dice imprimir (var1);
+simon dice imprimir (var3);
+simon dice imprimir (var4);
+
+simon dice suma(var1, var2);
+simon dice resta(var1, var2);
+simon dice multiplica(var1, var3);
+simon dice divide(var1, var2);
+simon dice modulo(var1, var2);
+
+simon dice suma(var1, var3); 
+simon dice resta(var3, var2);

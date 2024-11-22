@@ -1,0 +1,8 @@
+simon dice numero var1 = 10;
+simon dice numero var2 = 3;
+simon dice decimal var3 = 3.14;
+simon dice suma(var1, var3);
+simon dice resta(var1, var2);
+simon dice multiplica(var1, var3);
+simon dice divide(var1, var2);
+simon dice modulo(var1, var2);

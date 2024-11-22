@@ -72,6 +72,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 // Estructura para almacenar variables
 typedef struct {
@@ -86,13 +87,15 @@ int var_count = 0;
 void agregar_variable(const char* tipo, const char* nombre, const char* valor);
 void imprimir_texto(const char* texto);
 void imprimir_variable(const char* nombre);
+void realizar_operacion(const char* operacion, const char* var1, const char* var2);
+Variable* buscar_variable(const char* nombre);
 int yylex(void);
 
 void yyerror(const char* msg) {
     fprintf(stderr, "Error de sintaxis: %s\n", msg);
 }
 
-#line 96 "syntactic.tab.c"
+#line 99 "syntactic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -130,15 +133,21 @@ enum yysymbol_kind_t
   YYSYMBOL_BOOLEANO = 7,                   /* BOOLEANO  */
   YYSYMBOL_IMPRIMIR = 8,                   /* IMPRIMIR  */
   YYSYMBOL_IMPRIMIR_TEXTO = 9,             /* IMPRIMIR_TEXTO  */
-  YYSYMBOL_PUNTO_COMA = 10,                /* PUNTO_COMA  */
-  YYSYMBOL_FIN_LINEA = 11,                 /* FIN_LINEA  */
-  YYSYMBOL_YYACCEPT = 12,                  /* $accept  */
-  YYSYMBOL_programa = 13,                  /* programa  */
-  YYSYMBOL_sentencias = 14,                /* sentencias  */
-  YYSYMBOL_sentencia = 15,                 /* sentencia  */
-  YYSYMBOL_declaracion = 16,               /* declaracion  */
-  YYSYMBOL_impresion_texto = 17,           /* impresion_texto  */
-  YYSYMBOL_impresion = 18                  /* impresion  */
+  YYSYMBOL_SUMA = 10,                      /* SUMA  */
+  YYSYMBOL_RESTA = 11,                     /* RESTA  */
+  YYSYMBOL_MULTIPLICA = 12,                /* MULTIPLICA  */
+  YYSYMBOL_DIVIDE = 13,                    /* DIVIDE  */
+  YYSYMBOL_MODULO = 14,                    /* MODULO  */
+  YYSYMBOL_PUNTO_COMA = 15,                /* PUNTO_COMA  */
+  YYSYMBOL_FIN_LINEA = 16,                 /* FIN_LINEA  */
+  YYSYMBOL_YYACCEPT = 17,                  /* $accept  */
+  YYSYMBOL_programa = 18,                  /* programa  */
+  YYSYMBOL_sentencias = 19,                /* sentencias  */
+  YYSYMBOL_sentencia = 20,                 /* sentencia  */
+  YYSYMBOL_declaracion = 21,               /* declaracion  */
+  YYSYMBOL_impresion_texto = 22,           /* impresion_texto  */
+  YYSYMBOL_impresion = 23,                 /* impresion  */
+  YYSYMBOL_operacion = 24                  /* operacion  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -464,21 +473,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  14
+#define YYFINAL  20
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   11
+#define YYLAST   16
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  12
+#define YYNTOKENS  17
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  13
+#define YYNRULES  19
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  18
+#define YYNSTATES  24
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   266
+#define YYMAXUTOK   271
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -518,15 +527,16 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    38,    38,    43,    44,    49,    50,    51,    56,    61,
-      66,    71,    80,    90
+       0,    42,    42,    47,    48,    53,    54,    55,    56,    61,
+      66,    71,    76,    85,    95,   102,   107,   112,   117,   122
 };
 #endif
 
@@ -543,9 +553,10 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "SIMON_DICE", "NUMERO",
-  "DECIMAL", "PALABRA", "BOOLEANO", "IMPRIMIR", "IMPRIMIR_TEXTO",
-  "PUNTO_COMA", "FIN_LINEA", "$accept", "programa", "sentencias",
-  "sentencia", "declaracion", "impresion_texto", "impresion", YY_NULLPTR
+  "DECIMAL", "PALABRA", "BOOLEANO", "IMPRIMIR", "IMPRIMIR_TEXTO", "SUMA",
+  "RESTA", "MULTIPLICA", "DIVIDE", "MODULO", "PUNTO_COMA", "FIN_LINEA",
+  "$accept", "programa", "sentencias", "sentencia", "declaracion",
+  "impresion_texto", "impresion", "operacion", YY_NULLPTR
 };
 
 static const char *
@@ -569,8 +580,9 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       3,    -4,     7,     3,    -2,    -5,    -5,    -5,    -5,    -5,
-      -5,    -5,    -5,    -5,    -5,    -1,    -5,    -5
+       8,    -4,    12,     8,    -2,    -5,    -5,    -5,    -5,    -5,
+      -5,    -5,    -5,    -5,    -5,    -5,    -5,    -5,    -5,    -5,
+      -5,    -1,    -5,    -5
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -579,19 +591,20 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     2,     0,     5,     7,     6,     8,     9,
-      10,    11,    13,    12,     1,     0,     4,     3
+      10,    11,    12,    14,    13,    15,    16,    17,    18,    19,
+       1,     0,     4,     3
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -5,    -5,    -5,     8,    -5,    -5,    -5
+      -5,    -5,    -5,    13,    -5,    -5,    -5,    -5
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     4,     5,     6,     7
+       0,     2,     3,     4,     5,     6,     7,     8
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -599,36 +612,37 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       8,     9,    10,    11,    12,    13,     1,    14,    16,    17,
-       0,    15
+       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      19,     1,    20,    22,    23,     0,    21
 };
 
 static const yytype_int8 yycheck[] =
 {
-       4,     5,     6,     7,     8,     9,     3,     0,    10,    10,
-      -1,     3
+       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,     3,     0,    15,    15,    -1,     3
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    13,    14,    15,    16,    17,    18,     4,     5,
-       6,     7,     8,     9,     0,    15,    10,    10
+       0,     3,    18,    19,    20,    21,    22,    23,    24,     4,
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+       0,    20,    15,    15
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    12,    13,    14,    14,    15,    15,    15,    16,    16,
-      16,    16,    17,    18
+       0,    17,    18,    19,    19,    20,    20,    20,    20,    21,
+      21,    21,    21,    22,    23,    24,    24,    24,    24,    24
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     3,     2,     1,     1,     1,     2,     2,
-       2,     2,     2,     2
+       0,     2,     1,     3,     2,     1,     1,     1,     1,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2
 };
 
 
@@ -1091,67 +1105,117 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 8: /* declaracion: SIMON_DICE NUMERO  */
-#line 56 "syntactic.y"
+  case 9: /* declaracion: SIMON_DICE NUMERO  */
+#line 61 "syntactic.y"
                       { 
         char tipo[50], nombre[50], valor[50];
         sscanf((yyvsp[0].text), "%s %s = %s", tipo, nombre, valor);
         agregar_variable("numero", nombre, valor); 
     }
-#line 1102 "syntactic.tab.c"
+#line 1116 "syntactic.tab.c"
     break;
 
-  case 9: /* declaracion: SIMON_DICE DECIMAL  */
-#line 61 "syntactic.y"
+  case 10: /* declaracion: SIMON_DICE DECIMAL  */
+#line 66 "syntactic.y"
                          { 
         char tipo[50], nombre[50], valor[50];
         sscanf((yyvsp[0].text), "%s %s = %s", tipo, nombre, valor);
         agregar_variable("decimal", nombre, valor); 
     }
-#line 1112 "syntactic.tab.c"
+#line 1126 "syntactic.tab.c"
     break;
 
-  case 10: /* declaracion: SIMON_DICE PALABRA  */
-#line 66 "syntactic.y"
+  case 11: /* declaracion: SIMON_DICE PALABRA  */
+#line 71 "syntactic.y"
                          { 
         char tipo[50], nombre[50], valor[50];
         sscanf((yyvsp[0].text), "%s %s = \"%[^\"]\"", tipo, nombre, valor);
         agregar_variable("palabra", nombre, valor); 
     }
-#line 1122 "syntactic.tab.c"
+#line 1136 "syntactic.tab.c"
     break;
 
-  case 11: /* declaracion: SIMON_DICE BOOLEANO  */
-#line 71 "syntactic.y"
+  case 12: /* declaracion: SIMON_DICE BOOLEANO  */
+#line 76 "syntactic.y"
                           { 
         char tipo[50], nombre[50], valor[50];
         sscanf((yyvsp[0].text), "%s %s = %s", tipo, nombre, valor);
         agregar_variable("booleano", nombre, valor); 
     }
-#line 1132 "syntactic.tab.c"
+#line 1146 "syntactic.tab.c"
     break;
 
-  case 12: /* impresion_texto: SIMON_DICE IMPRIMIR_TEXTO  */
-#line 80 "syntactic.y"
+  case 13: /* impresion_texto: SIMON_DICE IMPRIMIR_TEXTO  */
+#line 85 "syntactic.y"
                               { 
-        char* content = strdup((yyvsp[0].text) + 1); // Extrae el texto sin la primera comilla
-        content[strlen(content) - 1] = '\0'; // Quita la última comilla
+        char* content = strdup((yyvsp[0].text) + 1); 
+        content[strlen(content) - 1] = '\0'; 
         imprimir_texto(content);
         free(content);
     }
-#line 1143 "syntactic.tab.c"
+#line 1157 "syntactic.tab.c"
     break;
 
-  case 13: /* impresion: SIMON_DICE IMPRIMIR  */
-#line 90 "syntactic.y"
+  case 14: /* impresion: SIMON_DICE IMPRIMIR  */
+#line 95 "syntactic.y"
                         { 
         imprimir_variable((yyvsp[0].text)); 
     }
-#line 1151 "syntactic.tab.c"
+#line 1165 "syntactic.tab.c"
+    break;
+
+  case 15: /* operacion: SIMON_DICE SUMA  */
+#line 102 "syntactic.y"
+                    { 
+        char var1[50], var2[50];
+        sscanf((yyvsp[0].text), "%[^,], %s", var1, var2);
+        realizar_operacion("suma", var1, var2); 
+    }
+#line 1175 "syntactic.tab.c"
+    break;
+
+  case 16: /* operacion: SIMON_DICE RESTA  */
+#line 107 "syntactic.y"
+                       { 
+        char var1[50], var2[50];
+        sscanf((yyvsp[0].text), "%[^,], %s", var1, var2);
+        realizar_operacion("resta", var1, var2); 
+    }
+#line 1185 "syntactic.tab.c"
+    break;
+
+  case 17: /* operacion: SIMON_DICE MULTIPLICA  */
+#line 112 "syntactic.y"
+                            { 
+        char var1[50], var2[50];
+        sscanf((yyvsp[0].text), "%[^,], %s", var1, var2);
+        realizar_operacion("multiplica", var1, var2); 
+    }
+#line 1195 "syntactic.tab.c"
+    break;
+
+  case 18: /* operacion: SIMON_DICE DIVIDE  */
+#line 117 "syntactic.y"
+                        { 
+        char var1[50], var2[50];
+        sscanf((yyvsp[0].text), "%[^,], %s", var1, var2);
+        realizar_operacion("divide", var1, var2); 
+    }
+#line 1205 "syntactic.tab.c"
+    break;
+
+  case 19: /* operacion: SIMON_DICE MODULO  */
+#line 122 "syntactic.y"
+                        { 
+        char var1[50], var2[50];
+        sscanf((yyvsp[0].text), "%[^,], %s", var1, var2);
+        realizar_operacion("modulo", var1, var2); 
+    }
+#line 1215 "syntactic.tab.c"
     break;
 
 
-#line 1155 "syntactic.tab.c"
+#line 1219 "syntactic.tab.c"
 
       default: break;
     }
@@ -1344,7 +1408,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 95 "syntactic.y"
+#line 129 "syntactic.y"
 
 
 // Implementación de las funciones de apoyo
@@ -1357,18 +1421,63 @@ void agregar_variable(const char* tipo, const char* nombre, const char* valor) {
     printf("Variable de tipo '%s' llamada '%s' almacenada con valor '%s'.\n", tipo, nombre, valor);
 }
 
+Variable* buscar_variable(const char* nombre) {
+    for (int i = 0; i < var_count; i++) {
+        if (strcmp(variables[i].nombre, nombre) == 0) {
+            return &variables[i];
+        }
+    }
+    return NULL;
+}
+
 void imprimir_texto(const char* texto) {
     printf("Imprimiendo texto: %s\n", texto);
 }
 
 void imprimir_variable(const char* nombre) {
-    for (int i = 0; i < var_count; i++) {
-        if (strcmp(variables[i].nombre, nombre) == 0) {
-            printf("Imprimiendo variable '%s': %s\n", nombre, variables[i].valor);
+    Variable* var = buscar_variable(nombre);
+    if (var) {
+        printf("Imprimiendo variable '%s': %s\n", nombre, var->valor);
+    } else {
+        printf("Error: Variable '%s' no encontrada.\n", nombre);
+    }
+}
+
+void realizar_operacion(const char* operacion, const char* var1, const char* var2) {
+    Variable* v1 = buscar_variable(var1);
+    Variable* v2 = buscar_variable(var2);
+
+    if (!v1 || !v2) {
+        printf("Error: Una o ambas variables no existen.\n");
+        return;
+    }
+
+    double valor1 = atof(v1->valor);
+    double valor2 = atof(v2->valor);
+
+    if (strcmp(operacion, "modulo") == 0 && (strcmp(v1->tipo, "numero") != 0 || strcmp(v2->tipo, "numero") != 0)) {
+        printf("Error: El módulo solo puede aplicarse a números enteros.\n");
+        return;
+    }
+
+    double resultado = 0;
+    if (strcmp(operacion, "suma") == 0) {
+        resultado = valor1 + valor2;
+    } else if (strcmp(operacion, "resta") == 0) {
+        resultado = valor1 - valor2;
+    } else if (strcmp(operacion, "multiplica") == 0) {
+        resultado = valor1 * valor2;
+    } else if (strcmp(operacion, "divide") == 0) {
+        if (valor2 == 0) {
+            printf("Error: División por cero.\n");
             return;
         }
+        resultado = valor1 / valor2;
+    } else if (strcmp(operacion, "modulo") == 0) {
+        resultado = (int)valor1 % (int)valor2;
     }
-    printf("Error: Variable '%s' no encontrada.\n", nombre);
+
+    printf("Resultado de la %s entre %s y %s: %.2f\n", operacion, var1, var2, resultado);
 }
 
 // Punto de entrada principal
